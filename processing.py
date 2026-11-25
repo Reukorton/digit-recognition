@@ -12,8 +12,21 @@ def find_contours(image):
     gray = cv2.cvtColor(image_array, cv2.COLOR_RGB2GRAY)
 
     # Бинаризация изображения
-    _, binary = cv2.threshold(
+    _, brightness_mask = cv2.threshold(
         gray, 127, 255, cv2.THRESH_BINARY_INV
+    )
+
+    red = image_array[:, :, 0].astype(np.int16)
+    blue = image_array[:, :, 2].astype(np.int16)
+
+    temperature = red - blue
+
+    warm_mask = np.where(
+        temperature > 30, 255, 0
+    ).astype(np.uint8)
+
+    binary = cv2.bitwise_or(
+        brightness_mask, warm_mask
     )
 
     # Поиск контуров
